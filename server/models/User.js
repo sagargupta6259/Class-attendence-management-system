@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { isDbConnected, memoryUsers, makeChainable } from "./store.js";
+import { memoryUsers, makeChainable } from "./store.js";
 
 const UserModel = mongoose.models.User || mongoose.model("User", new mongoose.Schema({
   name: String,
@@ -9,16 +9,20 @@ const UserModel = mongoose.models.User || mongoose.model("User", new mongoose.Sc
   rollNumber: String,
   semester: String,
   section: String
-}));
+}, { timestamps: true }));
 
 const User = {
   find: (filter = {}) => {
-    if (isDbConnected()) return UserModel.find(filter);
+    if (mongoose.connection.readyState === 1) {
+      return UserModel.find(filter).sort({ rollNumber: 1 });
+    }
     const result = memoryUsers.filter(u => (!filter.role || u.role === filter.role) && (!filter.semester || u.semester === filter.semester));
     return makeChainable(Promise.resolve(result));
   },
   findOne: async (query = {}) => {
-    if (isDbConnected()) return UserModel.findOne(query);
+    if (mongoose.connection.readyState === 1) {
+      return UserModel.findOne(query);
+    }
     const { email, password, $or } = query;
     return memoryUsers.find(u => {
       const matchEmail = $or ? $or.some(o => o.email === u.email || o.name === u.name) : u.email === email;
@@ -27,17 +31,23 @@ const User = {
     }) || null;
   },
   findById: async (id) => {
-    if (isDbConnected()) return UserModel.findById(id);
+    if (mongoose.connection.readyState === 1) {
+      return UserModel.findById(id);
+    }
     return memoryUsers.find(u => u._id.toString() === id?.toString()) || null;
   },
   create: async (data) => {
-    if (isDbConnected()) return UserModel.create(data);
+    if (mongoose.connection.readyState === 1) {
+      return UserModel.create(data);
+    }
     const newUser = { _id: "u_" + Date.now(), ...data };
     memoryUsers.push(newUser);
     return newUser;
   },
   findByIdAndDelete: async (id) => {
-    if (isDbConnected()) return UserModel.findByIdAndDelete(id);
+    if (mongoose.connection.readyState === 1) {
+      return UserModel.findByIdAndDelete(id);
+    }
     const idx = memoryUsers.findIndex(u => u._id.toString() === id?.toString());
     if (idx !== -1) memoryUsers.splice(idx, 1);
     return { _id: id };
