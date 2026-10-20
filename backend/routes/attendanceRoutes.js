@@ -11,13 +11,13 @@ const getStats = (attended, total) => ({
   isShortage: total > 0 && (attended / total) < 0.75
 });
 
-// Check Attendance
+
 router.get("/check", async (req, res) => {
   const attendance = await Attendance.findOne({ subject: req.query.subjectId, date: req.query.date });
   res.json({ exists: !!attendance, attendance });
 });
 
-// Mark Attendance
+
 router.post("/mark", async (req, res) => {
   const { subjectId, date, records } = req.body;
   const attendance = await Attendance.findOneAndUpdate(
@@ -28,7 +28,6 @@ router.post("/mark", async (req, res) => {
   res.json({ message: "Attendance saved", attendance });
 });
 
-// Student Attendance Summary
 router.get("/student/:studentId", async (req, res) => {
   const student = await User.findById(req.params.studentId);
   if (!student) return res.status(404).json({ message: "Student not found" });
@@ -50,7 +49,7 @@ router.get("/student/:studentId", async (req, res) => {
   res.json({ student, subjects: subjectSummaries });
 });
 
-// Student Subject Detail
+
 router.get("/student/:studentId/subject/:subjectId", async (req, res) => {
   const { studentId, subjectId } = req.params;
   const [student, subject, list] = await Promise.all([
@@ -71,7 +70,7 @@ router.get("/student/:studentId/subject/:subjectId", async (req, res) => {
   res.json({ student, subject, total: list.length, attended, records, ...getStats(attended, list.length) });
 });
 
-// Shortage List (< 75%)
+
 router.get("/shortage", async (req, res) => {
   const [students, subjects, list] = await Promise.all([
     User.find({ role: "student" }).sort({ rollNumber: 1 }),
@@ -101,7 +100,7 @@ router.get("/shortage", async (req, res) => {
   res.json(shortageList);
 });
 
-// Admin Dashboard Summary
+
 router.get("/dashboard", async (req, res) => {
   const today = new Date().toISOString().split("T")[0];
   const [students, subjects, list] = await Promise.all([

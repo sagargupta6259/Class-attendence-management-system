@@ -1,19 +1,69 @@
-# React + Vite
+# Class Attendance Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is organized into two main directories: **Backend** (Node.js/Express + MongoDB) and **Frontend** (React + Vite).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📁 Project Structure
 
-## React Compiler
+```text
+attendeance/
+├── backend/                  # Backend API Server
+│   ├── config/               # Database configuration
+│   ├── middleware/           # Express middlewares (e.g. error handling)
+│   ├── models/               # Mongoose & In-Memory models (User, Subject, Attendance)
+│   ├── routes/               # API route handlers
+│   ├── index.js              # Server entry point (Express app)
+│   ├── package.json          # Backend dependencies & scripts
+│   └── .env.example          # Environment variables template
+│
+├── frontend/                 # Frontend Web Application
+│   ├── public/               # Static assets & icons
+│   ├── src/                  # React source code (components, pages, styles)
+│   ├── index.html            # Vite HTML template
+│   ├── vite.config.js        # Vite configuration & proxy settings
+│   ├── eslint.config.js      # ESLint configuration
+│   └── package.json          # Frontend dependencies & scripts
+│
+├── api/                      # Vercel serverless entry point
+├── vercel.json               # Vercel deployment configuration
+├── package.json              # Root package manager & monorepo scripts
+└── README.md
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🚀 How to Run
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# Class-attendence-management-system
-# Class-attendence-management-system
-# Class-attendence-management-system
+### Option 1: Run Both from Root (Recommended)
+
+1. **Install dependencies:**
+   ```bash
+   npm run install:all
+   ```
+
+2. **Start Backend and Frontend together:**
+   ```bash
+   npm run dev
+   ```
+   - Frontend runs at: `http://localhost:5173`
+   - Backend runs at: `http://localhost:5001`
+
+---
+
+### Option 2: Run Backend and Frontend Separately
+
+#### **Backend:**
+```bash
+cd backend
+npm install
+npm start
+# or npm run dev (with auto-reload)
+```
+
+#### **Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
