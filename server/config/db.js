@@ -1,15 +1,18 @@
 import mongoose from "mongoose";
 
-let isConnected = false;
-
 const connectDB = async () => {
-  if (isConnected) return;
+  if (process.env.VERCEL && !process.env.MONGO_URI) {
+    console.log("Vercel Cloud: Running in In-Memory Database Mode");
+    return;
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/attendance_db");
-    isConnected = conn.connections[0].readyState;
+    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/attendance_db", {
+      serverSelectionTimeoutMS: 2500
+    });
     console.log("MongoDB Connected");
   } catch (err) {
-    console.log("DB Error:", err.message);
+    console.log("Using In-Memory Database Mode:", err.message);
   }
 };
 
