@@ -2,6 +2,16 @@ import mongoose from "mongoose";
 
 export const isDbConnected = () => mongoose.connection.readyState === 1;
 
+export const makeChainable = (promise) => {
+  promise.sort = (sortObj) => makeChainable(promise.then(arr => {
+    if (!Array.isArray(arr) || !sortObj) return arr;
+    const key = Object.keys(sortObj)[0];
+    const dir = sortObj[key] === -1 ? -1 : 1;
+    return [...arr].sort((a, b) => (a[key] > b[key] ? dir : a[key] < b[key] ? -dir : 0));
+  }));
+  return promise;
+};
+
 export let memoryUsers = [
   { _id: "u1", name: "Admin Teacher", email: "admin@college.com", password: "admin", role: "admin", rollNumber: "", semester: "", section: "" },
   { _id: "u2", name: "sagar", email: "sagar@gmail.com", password: "12345", role: "admin", rollNumber: "", semester: "", section: "" },

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { isDbConnected, memoryUsers } from "./store.js";
+import { isDbConnected, memoryUsers, makeChainable } from "./store.js";
 
 const UserModel = mongoose.models.User || mongoose.model("User", new mongoose.Schema({
   name: String,
@@ -12,9 +12,10 @@ const UserModel = mongoose.models.User || mongoose.model("User", new mongoose.Sc
 }));
 
 const User = {
-  find: async (filter = {}) => {
-    if (isDbConnected()) return UserModel.find(filter).sort({ rollNumber: 1 });
-    return memoryUsers.filter(u => (!filter.role || u.role === filter.role) && (!filter.semester || u.semester === filter.semester));
+  find: (filter = {}) => {
+    if (isDbConnected()) return UserModel.find(filter);
+    const result = memoryUsers.filter(u => (!filter.role || u.role === filter.role) && (!filter.semester || u.semester === filter.semester));
+    return makeChainable(Promise.resolve(result));
   },
   findOne: async (query = {}) => {
     if (isDbConnected()) return UserModel.findOne(query);

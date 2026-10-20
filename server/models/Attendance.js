@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { isDbConnected, memoryAttendance } from "./store.js";
+import { isDbConnected, memoryAttendance, makeChainable } from "./store.js";
 
 const AttendanceModel = mongoose.models.Attendance || mongoose.model("Attendance", new mongoose.Schema({
   subject: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
@@ -8,10 +8,12 @@ const AttendanceModel = mongoose.models.Attendance || mongoose.model("Attendance
 }));
 
 const Attendance = {
-  find: async (filter = {}) => {
+  find: (filter = {}) => {
     if (isDbConnected()) return AttendanceModel.find(filter);
-    if (filter.subject) return memoryAttendance.filter(a => a.subject.toString() === filter.subject.toString());
-    return memoryAttendance;
+    const result = filter.subject
+      ? memoryAttendance.filter(a => a.subject.toString() === filter.subject.toString())
+      : memoryAttendance;
+    return makeChainable(Promise.resolve(result));
   },
   findOne: async (query = {}) => {
     if (isDbConnected()) return AttendanceModel.findOne(query);

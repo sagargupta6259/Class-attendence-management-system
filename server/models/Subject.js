@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { isDbConnected, memorySubjects } from "./store.js";
+import { isDbConnected, memorySubjects, makeChainable } from "./store.js";
 
 const SubjectModel = mongoose.models.Subject || mongoose.model("Subject", new mongoose.Schema({
   name: String,
@@ -9,9 +9,10 @@ const SubjectModel = mongoose.models.Subject || mongoose.model("Subject", new mo
 }));
 
 const Subject = {
-  find: async (filter = {}) => {
-    if (isDbConnected()) return SubjectModel.find(filter).sort({ semester: 1 });
-    return memorySubjects.filter(s => !filter.semester || s.semester === filter.semester);
+  find: (filter = {}) => {
+    if (isDbConnected()) return SubjectModel.find(filter);
+    const result = memorySubjects.filter(s => !filter.semester || s.semester === filter.semester);
+    return makeChainable(Promise.resolve(result));
   },
   findById: async (id) => {
     if (isDbConnected()) return SubjectModel.findById(id);
